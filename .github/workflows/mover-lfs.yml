@@ -1,0 +1,36 @@
+name: Mover 4 Releases para LFS
+on: workflow_dispatch
+
+jobs:
+  move:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          token: ${{ github.token }}
+      - name: Configurar LFS e Baixar Arquivos
+        run: |
+          git lfs install
+
+          # 1. Configura o rastreio primeiro
+          git lfs track "*.exe"
+          git lfs track "*.zip"
+
+          # 2. Configura o usuário
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+          # 3. Baixa os arquivos
+          curl -L -o ff.exe "https://github.com/gustavovalerio/apps-gustavovalerio.github.io/releases/download/FF/FirefoxPortable_150.0.3_PortugueseBR.paf.exe"
+          curl -L -o lo.exe "https://github.com/gustavovalerio/apps-gustavovalerio.github.io/releases/download/LO/LibreOfficePortable_26.2.1_MultilingualStandard.paf.exe"
+          curl -L -o py.zip "https://github.com/gustavovalerio/apps-gustavovalerio.github.io/releases/download/PY/py.zip"
+          curl -L -o ma.zip "https://github.com/gustavovalerio/apps-gustavovalerio.github.io/releases/download/MA/MA.zip"
+
+          # 4. Adiciona TUDO (o .gitattributes e os arquivos)
+          git add .gitattributes
+          git add ff.exe lo.exe py.zip ma.zip
+
+          git commit -m "Movendo os 4 arquivos para o domínio via LFS"
+          git push origin main
